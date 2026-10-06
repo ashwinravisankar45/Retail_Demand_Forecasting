@@ -1,268 +1,390 @@
-# Retail Demand Forecasting
+Retail Demand Forecasting
 
-A machine learning project for forecasting weekly retail product demand using historical sales-related features such as price, promotions, holidays, store, SKU, and time-based patterns.
+A machine learning pipeline for forecasting weekly retail product demand using historical sales, pricing, promotion, holiday, store, SKU, and time-based features.
 
-## Overview
+The project demonstrates an end-to-end machine learning workflow covering data preparation, feature engineering, preprocessing, model training, chronological evaluation, model serialization, and forecast visualization.
 
-Retail demand forecasting helps businesses estimate future product demand and make better decisions around inventory, pricing, promotions, and supply planning.
+Overview
 
-This project builds a machine learning pipeline that:
+Accurate demand forecasting helps retailers make better decisions around:
 
-- Processes weekly retail demand data
-- Creates time-based features
-- Encodes categorical store and SKU information
-- Trains a `HistGradientBoostingRegressor`
-- Evaluates the model using Mean Absolute Error (MAE)
-- Saves the trained forecasting model
-- Generates an example actual-vs-forecast visualization
+Inventory planning
 
-## Project Structure
+Product availability
 
-```text
-retail_demand_forecasting/
+Pricing
+
+Promotions
+
+Supply planning
+
+This project builds a supervised machine learning pipeline that predicts weekly product demand (units) from historical retail data.
+
+Project Workflow
+
+Raw Retail Data
+      │
+      ▼
+Data Preparation
+      │
+      ▼
+Time-Based Feature Engineering
+      │
+      ▼
+Categorical & Numerical Preprocessing
+      │
+      ▼
+HistGradientBoostingRegressor
+      │
+      ▼
+Chronological Evaluation
+      │
+      ▼
+Forecast Visualization
+      │
+      ▼
+Exported ML Model
+
+Key Highlights
+
+Built a complete retail demand forecasting pipeline using Python
+
+Engineered calendar and seasonal features from weekly dates
+
+Encoded store and SKU identifiers using OneHotEncoder
+
+Trained a HistGradientBoostingRegressor
+
+Used a chronological 80/20 train-test split to preserve temporal ordering
+
+Evaluated predictions using Mean Absolute Error (MAE)
+
+Achieved a test MAE of 12.58
+
+Serialized the trained forecasting pipeline using joblib
+
+Generated actual-vs-predicted demand visualizations
+
+Organized the project into reproducible data, model, notebook, report, and source-code directories
+
+Dataset
+
+The project uses weekly retail demand data containing the following fields:
+
+Feature
+
+Description
+
+week_start
+
+Start date of the sales week
+
+store_id
+
+Store identifier
+
+sku_id
+
+Product/SKU identifier
+
+price
+
+Product price
+
+promo
+
+Promotion indicator
+
+holiday
+
+Holiday indicator
+
+units
+
+Target variable representing weekly demand
+
+Target Variable
+
+units
+
+The model learns the relationship between the available retail and time-based features and the number of units demanded.
+
+Feature Engineering
+
+The week_start date is transformed into multiple temporal features:
+
+Week of year
+
+Month
+
+Year
+
+Sine transformation of week number
+
+Cosine transformation of week number
+
+Seasonal Encoding
+
+The sine and cosine transformations provide a cyclical representation of the week-of-year feature, allowing the model to capture recurring annual patterns more effectively.
+
+weekofyear
+      │
+      ├── sin_woy
+      │
+      └── cos_woy
+
+Machine Learning Pipeline
+
+Categorical Features
+
+store_id
+sku_id
+
+These categorical variables are transformed using:
+
+OneHotEncoder
+
+Numerical Features
+
+price
+promo
+holiday
+weekofyear
+month
+year
+sin_woy
+cos_woy
+
+Model
+
+The forecasting model is:
+
+HistGradientBoostingRegressor
+
+Configuration:
+
+max_depth      = 8
+learning_rate  = 0.08
+max_iter       = 300
+random_state   = 42
+
+Train-Test Strategy
+
+Because this is a demand forecasting problem, the data is split chronologically rather than randomly.
+
+Historical Timeline
+│
+├────────────── 80% ──────────────┤── 20% ──┤
+│             Training            │ Testing │
+└─────────────────────────────────┴─────────┘
+
+This prevents future observations from being randomly mixed into the training data and provides a more appropriate evaluation setup for time-dependent demand forecasting.
+
+Model Performance
+
+The model is evaluated using:
+
+Mean Absolute Error — MAE
+
+MAE = 12.58
+
+MAE measures the average absolute difference between actual and predicted demand.
+
+Lower MAE indicates better predictive accuracy.
+
+The evaluation metric is stored in:
+
+reports/metrics.json
+
+Forecast Visualization
+
+The project generates an actual-vs-predicted demand visualization for:
+
+Store: S100
+SKU: SKU1000
+
+The visualization compares:
+
+Actual weekly demand
+
+Predicted weekly demand
+
+Output:
+
+reports/example_forecast.png
+
+Model Export
+
+The trained forecasting pipeline is serialized using joblib:
+
+models/demand_forecaster.joblib
+
+The exported object contains:
+
+{
+    "model": model,
+    "mae": mae
+}
+
+This allows the trained model and its evaluation result to be retained for future inference without retraining the model.
+
+Project Structure
+
+Retail_Demand_Forecasting/
 │
 ├── data/
+│   ├── make_dataset.py
 │   └── weekly_demand.csv
 │
 ├── models/
 │   └── demand_forecaster.joblib
 │
 ├── notebooks/
+│   └── demand_forecasting.ipynb
 │
 ├── reports/
-│   ├── metrics.json
-│   └── example_forecast.png
+│   ├── example_forecast.png
+│   └── metrics.json
 │
 ├── src/
 │   ├── forecast.py
 │   └── train_and_export.py
 │
+├── .gitignore
 ├── README.md
 └── requirements.txt
-```
 
-## Dataset
+Technologies & Tools
 
-The model uses weekly retail demand data containing features such as:
+Category
 
-| Feature | Description |
-|---|---|
-| `week_start` | Start date of the sales week |
-| `store_id` | Store identifier |
-| `sku_id` | Product/SKU identifier |
-| `price` | Product price |
-| `promo` | Promotion indicator |
-| `holiday` | Holiday indicator |
-| `units` | Target variable representing demand |
+Technologies
 
-## Feature Engineering
+Programming
 
-The project creates additional time-based features from `week_start`:
+Python
 
-- Week of year
-- Month
-- Year
-- Sine transformation of week number
-- Cosine transformation of week number
+Data Processing
 
-The sine and cosine transformations help the model capture seasonal patterns across the year.
+Pandas, NumPy
 
-## Machine Learning Pipeline
+Machine Learning
 
-The preprocessing pipeline contains:
+Scikit-learn
 
-### Categorical Features
+Visualization
 
-- `store_id`
-- `sku_id`
+Matplotlib, Seaborn
 
-These features are transformed using `OneHotEncoder`.
+Model Serialization
 
-### Numerical Features
+Joblib
 
-- `price`
-- `promo`
-- `holiday`
-- `weekofyear`
-- `month`
-- `year`
-- `sin_woy`
-- `cos_woy`
+Development
 
-### Model
+Jupyter Notebook, VS Code
 
-The forecasting model uses:
+Version Control
 
-```text
-HistGradientBoostingRegressor
-```
+Git, GitHub
 
-Configuration:
+Installation
 
-```text
-max_depth = 8
-learning_rate = 0.08
-max_iter = 300
-random_state = 42
-```
+1. Clone the repository
 
-## Train-Test Split
+git clone https://github.com/ashwinravisankar45/Retail_Demand_Forecasting.git
+cd Retail_Demand_Forecasting
 
-The dataset is divided chronologically rather than randomly.
+2. Create a virtual environment
 
-- 80% of the timeline → Training data
-- 20% of the timeline → Testing data
+Windows PowerShell
 
-This approach is suitable for demand forecasting because future observations should not be used to train the model.
-
-## Evaluation
-
-The model is evaluated using **Mean Absolute Error (MAE)**.
-
-The current model produced:
-
-```text
-MAE: 12.58
-```
-
-A lower MAE indicates that the model's demand predictions are closer to the actual demand values.
-
-## Installation
-
-Create and activate a virtual environment:
-
-### Windows PowerShell
-
-```powershell
 python -m venv venv
-```
 
 Activate it:
 
-```powershell
 .\venv\Scripts\Activate.ps1
-```
 
-Install the required packages:
+3. Install dependencies
 
-```powershell
-pip install pandas numpy scikit-learn matplotlib seaborn jupyter joblib
-```
+pip install -r requirements.txt
 
-## Running the Project
+Running the Project
 
-Make sure the dataset is available at:
+Ensure the dataset is available at:
 
-```text
 data/weekly_demand.csv
-```
 
-Then run:
+Run the training pipeline:
 
-```powershell
 python src/train_and_export.py
-```
 
-Successful execution will generate:
+Successful execution generates:
 
-```text
 models/demand_forecaster.joblib
 reports/metrics.json
 reports/example_forecast.png
-```
 
-The terminal will display the model performance:
+The terminal displays the resulting model performance:
 
-```text
 Saved models/demand_forecaster.joblib
 MAE: 12.58
-```
 
-## Forecast Visualization
+Key Concepts Demonstrated
 
-The project generates an example forecast for:
+This project demonstrates practical knowledge of:
 
-```text
-Store: S100
-SKU: SKU1000
-```
+Data preprocessing
 
-The visualization compares:
+Feature engineering
 
-- Actual weekly demand
-- Predicted weekly demand
+Time-series feature extraction
 
-The generated chart is saved as:
+Cyclical feature encoding
 
-```text
-reports/example_forecast.png
-```
+Categorical variable encoding
 
-## Model Export
+Gradient boosting regression
 
-The trained pipeline is saved using `joblib`:
+Chronological train-test splitting
 
-```text
-models/demand_forecaster.joblib
-```
+Model evaluation
 
-The saved object contains:
+Model serialization
 
-```python
-{
-    "model": model,
-    "mae": mae
-}
-```
+Demand forecasting
 
-This allows the trained model to be reused for future predictions without retraining.
+Data visualization
 
-## Technologies Used
+Reproducible ML project organization
 
-- Python
-- Pandas
-- NumPy
-- Scikit-learn
-- Matplotlib
-- Seaborn
-- Joblib
-- Jupyter Notebook
+Future Improvements
 
-## Key Concepts
+Potential extensions include:
 
-This project demonstrates practical applications of:
+Adding lag-based demand features
 
-- Data preprocessing
-- Feature engineering
-- Time-series feature extraction
-- Categorical encoding
-- Gradient boosting
-- Regression
-- Model evaluation
-- Model serialization
-- Demand forecasting
-- Data visualization
+Adding rolling demand statistics
 
-## Future Improvements
+Comparing XGBoost and LightGBM
 
-Potential improvements include:
+Hyperparameter optimization
 
-- Adding lag-based demand features
-- Adding rolling average features
-- Testing XGBoost or LightGBM
-- Hyperparameter tuning
-- Comparing multiple forecasting models
-- Adding additional historical demand features
-- Building an interactive forecasting dashboard
-- Deploying the model as an API
-- Adding automated future-demand predictions
+Comparing multiple forecasting algorithms
 
-## Author
+Incorporating additional historical demand information
+
+Building an interactive forecasting dashboard
+
+Exposing the model through an API
+
+Automating future-demand predictions
+
+Author
 
 Ashwin
-B.Tech Computer Science & Engineering  
-Data Science | Artificial Intelligence | Machine Learning
 
----
+B.Tech Computer Science & Engineering
+Data Science | Artificial Intelligence | Machine Learning
 
 ⭐ If you find this project useful, consider giving the repository a star.
